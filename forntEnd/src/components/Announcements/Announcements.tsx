@@ -23,11 +23,11 @@ export default function Announcements({ token }: Props) {
   const fetchAnnouncements = async (page: number) => {
     setLoading(true); 
     try {
-      const { announcements: fetchedAnnouncements, total: fetchedTotal } =
+      const { announcementDtos, total } =
         await getAllAnnouncements(page, token!);
 
-      setAnnouncements(fetchedAnnouncements);
-      setTotal(fetchedTotal);
+      setAnnouncements(announcementDtos);
+      setTotal(total);
     } catch (err) {
       console.error("Announcements component error:", err);
       setError("Failed to load announcements. Please try again later.");

@@ -39,13 +39,25 @@ export async function GET(request: NextRequest) {
   console.log(" GET in  announcements route.ts.................");
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page") || "1";
+  const type = searchParams.get('type');
+
   console.log(new URL(request.url), " ", page);
   const jwtTokenHeader = request.headers.get("JwtToken");
 
   try {
-    const url = `${BASE_URL}${endpoints.userAnnouncements}${
-      page === "1" ? "" : `?page=${page}`
-    }`;
+    let url;
+    if(type === "user")
+    {
+      url = `${BASE_URL}${endpoints.userAnnouncements}${
+        page === "1" ? "" : `?page=${page}`
+      }`;
+    }
+    else{
+      url = `${BASE_URL}${endpoints.allAnnouncements}${
+        page === "1" ? "" : `?page=${page}`
+      }`;
+    }
+    
     console.log("url ", url);
     const response = await fetch(url, {
       headers: {
@@ -61,6 +73,8 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
+    // console.log(" route.js data........................", data);
+
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(

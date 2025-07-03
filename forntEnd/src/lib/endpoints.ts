@@ -3,7 +3,7 @@ export const endpoints = {
   announcements : '/announcements',
   userAnnouncements : '/announcements/user',
   updateAnnouncement : '/announcements/update',
-  getAllAnnouncements : '/announcements/all',
+  allAnnouncements : '/announcements/all',
   books: '/books',
   discussions: '/discussions',
   deleteAnnouncement: '/announcements',

@@ -13,7 +13,7 @@ export default async function AnnouncementsPage({
   const token = (await cookies()).get("authToken")?.value;
   const currentPage = Number(searchParamsObj.page) || 1;
 
-  const { announcements, total } = await getUserAnnouncements(
+  const { announcementDtos, total } = await getUserAnnouncements(
     currentPage,
     token!
   );
@@ -22,7 +22,7 @@ export default async function AnnouncementsPage({
     <div className="min-h-screen bg-[#DAD7CE] p-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnnouncementsList
-          announcements={announcements}
+          announcements={announcementDtos}
           total={total}
           currentPage={currentPage}
           token={token}

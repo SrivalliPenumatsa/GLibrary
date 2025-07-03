@@ -114,7 +114,7 @@ export async function getAllAnnouncements(
   page: number = 1,
   token: string
 ): Promise<any> {
-  const response = await fetch(`${BASE_URL}/api/announcements?page=${page}`, {
+  const response = await fetch(`${BASE_URL}/api/announcements?page=${page}&type=all`, {
     headers: {
       JwtToken: `${token}`,
     },
@@ -124,23 +124,30 @@ export async function getAllAnnouncements(
   if (!response.ok) {
     throw new Error("Failed to fetch announcements");
   }
+  const data = await response.json();
 
-  return response.json();
+  console.log("response in action ...................................... ",data);
+  return data;
 }
 
 export async function getUserAnnouncements(
   page: number = 1,
   token: string
 ): Promise<any> {
-  const response = await fetch(`${BASE_URL}/api/announcements?page=${page}`, {
+  const response = await fetch(`${BASE_URL}/api/announcements?page=${page}&type=user`, {
     method: "GET",
     next: { tags: ["userAnnouncements"] },
     headers: {
       JwtToken: `${token}`,
     },
   });
+  // console.log("response from backend ",response.body);
+  
   if (!response.ok) {
     throw new Error("Failed to fetch user announcements");
   }
-  return response.json();
+  const data = await response.json();
+    console.log(" route.js data in action........................", data);
+  
+  return data;
 }

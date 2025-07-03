@@ -26,7 +26,7 @@ export default async function DiscussionListDisplay({
 
   return (
     <Suspense fallback={<SkeletonLoader />}>
-      <div className="space-y-4">
+      <div className="space-y-4 overflow-auto">
         {error && (
           <p className="text-[#C45E4C] p-4 bg-[#F5F1ED] rounded-lg border border-[#A38579]">
             {error}
@@ -40,15 +40,26 @@ export default async function DiscussionListDisplay({
           discussions.map((discussion) => (
             <div
               key={discussion.discussionId}
-              className="border border-gray-200 p-4 rounded-lg bg-white shadow-sm"
+              className="p-2 flex flex-row gap-x-2"
             >
+              <span className="min-w-50 border border-gray-200 rounded-lg bg-white shadow-sm p-2 px-4">
               <p className="font-semibold text-gray-800">
+                {discussion.userName}
+              </p>
+              <p className="text-sm text-gray-500">
+                {new Date(discussion.createdAt).toLocaleString()}
+              </p>
+              </span>
+              <span className="border border-gray-200 rounded-lg bg-white shadow-sm p-2 ">
+              <p className="text-gray-700 my-2">{discussion.content}</p>
+              </span>
+              {/* <p className="font-semibold text-gray-800">
                 {discussion.userName}
               </p>
               <p className="text-gray-700 my-2">{discussion.content}</p>
               <p className="text-sm text-gray-500">
                 {new Date(discussion.createdAt).toLocaleString()}
-              </p>
+              </p> */}
             </div>
           ))
         )}
