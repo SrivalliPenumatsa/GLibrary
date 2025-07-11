@@ -1,48 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { endpoints } from "@/lib/endpoints";
+import { cookies } from "next/headers";
 
-const BASE_URL =
-  typeof window === "undefined"
-    ? process.env.NEST_API_BASE_URL
-    : process.env.NEXT_PUBLIC_NEST_API_BASE_URL;
-// const BASE_URL = "http://localhost:3001"
 
-export async function POST(request: Request) {
-  const jwtTokenHeader = request.headers.get("JwtToken");
-  try {
-    const body = await request.json();
-    const response = await fetch(`${BASE_URL}/announcements`, {
-      method: "POST",
-      headers: {
-        JwtToken: `${jwtTokenHeader}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+const BASE_URL = process.env.NEST_API_BASE_URL
 
-    if (!response.ok) {
-      throw new Error("Failed to create announcement");
-    }
-
-    const data = await response.json();
-    //   revalidateTag('userAnnouncements');
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
-  }
-}
 
 export async function GET(request: NextRequest) {
-  console.log(" GET in  announcements route.ts.................");
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page") || "1";
   const type = searchParams.get('type');
+const cookieAuthToken = (await cookies()).get("accessToken")?.value;
+const headerAuthToken = await request.headers.get('accessToken');
 
-  console.log(new URL(request.url), " ", page);
-  const jwtTokenHeader = request.headers.get("JwtToken");
+const tokenToUse = cookieAuthToken ?? headerAuthToken; 
+
 
   try {
     let url;
@@ -50,7 +22,7 @@ export async function GET(request: NextRequest) {
     {
       url = `${BASE_URL}${endpoints.userAnnouncements}${
         page === "1" ? "" : `?page=${page}`
-      }`;
+      }`;  
     }
     else{
       url = `${BASE_URL}${endpoints.allAnnouncements}${
@@ -61,7 +33,7 @@ export async function GET(request: NextRequest) {
     console.log("url ", url);
     const response = await fetch(url, {
       headers: {
-        JwtToken: `${jwtTokenHeader}`,
+        'Authorization': `Bearer ${ tokenToUse}`,
         "Content-Type": "application/json",
       },
       credentials: "include",
@@ -73,8 +45,6 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    // console.log(" route.js data........................", data);
-
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
@@ -83,3 +53,37 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+
+
+
+
+export async function POST(request: NextRequest) {  
+  const token = request.headers.get("accessToken");
+  try {
+    const body = await request.json();
+    const response = await fetch(`${BASE_URL}/announcements`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    console.log(" response in route  ",response.body);
+    
+
+    if (!response.ok) {
+      throw new Error("Failed to create announcement");
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}
+

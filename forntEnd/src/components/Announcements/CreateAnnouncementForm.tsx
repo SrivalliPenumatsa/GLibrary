@@ -4,7 +4,7 @@ import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { CreateAnnouncement } from '@/services/announcements/actions';
 import { useRouter } from 'next/navigation';
 
-export default function CreateAnnouncementForm({ token }: { token?: string }) {
+export default function CreateAnnouncementForm() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -31,7 +31,7 @@ export default function CreateAnnouncementForm({ token }: { token?: string }) {
     }
 
     try {
-      await CreateAnnouncement(title, description, imageFile, token || '');
+      await CreateAnnouncement(title, description, imageFile);
       if(imageFile.size < 0)
       {
         setError("empty image");
@@ -41,7 +41,7 @@ export default function CreateAnnouncementForm({ token }: { token?: string }) {
         }
       }
       else{
-setTitle('');
+      setTitle('');
       setDescription('');
       setError(null);
       setImageFile(null);

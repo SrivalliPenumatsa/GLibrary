@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { endpoints } from "@/lib/endpoints";
 import { cookies } from "next/headers";
 
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -17,10 +18,8 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
-    console.log("response in login post ", data);
-
-    if (data?.jwtToken) {
-      (await cookies()).set("authToken", data.jwtToken.toString(), {
+    if (data?.token) {
+      (await cookies()).set("accessToken", data.token.toString(), {
         path: "/",
         maxAge: 60 * 60,
       });

@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { submitDiscussion } from '@/services/discussions/actions';
+import '../../../styles.css';
 
 interface DiscussionFormProps {
   bookId: string;
-  token:string
 }
 
-export default function DiscussionForm({ bookId, token }: DiscussionFormProps) {
+export default function DiscussionForm({ bookId}: DiscussionFormProps) {
   const router = useRouter();
   const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export default function DiscussionForm({ bookId, token }: DiscussionFormProps) {
     }
 
     try {
-      await submitDiscussion(bookId, content, token!);
+      await submitDiscussion(bookId, content);
       setContent('');
       setError(null);
       router.refresh();
@@ -34,20 +34,20 @@ export default function DiscussionForm({ bookId, token }: DiscussionFormProps) {
     }
   };
   return (
-    <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 space-x-2 rounded-lg shadow-sm border border-gray-200 flex flex-row ">
       {error && <p className="text-red-500 mb-3 p-2 bg-red-50 rounded-md">{error}</p>}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="w-full p-3 border border-[#C45E4C] rounded-lg focus:ring-2  focus:border-transparent"
-        placeholder="Add a discussion point..."
+        className="w-full h-12 p-3 border border-[#C45E4C] rounded-lg focus:border-transparent"
+        placeholder="Add your point..."
         rows={4}
       />
       <button 
         type="submit" 
         className="px-4 py-2 bg-[#C45E4C] text-white rounded-lg hover:bg-[#B05444] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
-        Post Discussion
+        Send
       </button>
     </form>
   );

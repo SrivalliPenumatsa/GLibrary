@@ -1,33 +1,32 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Request } from 'express';
-import { lastValueFrom } from 'rxjs';
-// import { JwtService } from '@nestjs/jwt';
 import * as jwt from 'jsonwebtoken';
 
 
 @Injectable()
 export class JwtGuard implements CanActivate {
-  constructor(private readonly httpService: HttpService) {}
+  constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     console.log("AuthorizeGuard start");
 
     const request: Request = context.switchToHttp().getRequest();
     console.log("request.url.. in auth guard .. ",request.url);
+    console.log("Headers in be ",request.headers);
+    
 
-    let jwtToken = request.header('JwtToken')
-    console.log("JWT TOKEN ",jwtToken);
+    const token = request.header('Authorization')!.split(' ')[1];
+    console.log("Authorization Token in be ...  ", token);
+    
+
     try{
       const secret = process.env.JWT_SECRET;
       if (!secret) {
         throw new Error('JWT_SECRET is not defined');
       }
-      
-      const payload =  jwt.verify(jwtToken!, secret);
-      console.log("User payload fron jwt.. ",payload);
+      const payload =  jwt.verify(token, secret);
       request['user'] = payload;
-      // request.user = payload;
 
       
     }  catch (error) {

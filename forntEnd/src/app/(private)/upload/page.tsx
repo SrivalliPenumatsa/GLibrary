@@ -1,8 +1,8 @@
 import UploadForm from "@/components/Books/UploadForm";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 
 export default async function UploadBook() {
-  const token = (await cookies()).get("authToken")?.value;
+  // const token = (await cookies()).get("authToken")?.value;
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-[#DAD7CE] rounded-xl shadow-lg border border-[#A38579] flex flex-col md:flex-row gap-6">
@@ -31,7 +31,7 @@ export default async function UploadBook() {
       {/* Upload Form */}
       <div className="md:w-2/3 m-4">
         <div>
-          <UploadForm token={token} />
+          <UploadForm/>
         </div>
       </div>
     </div>

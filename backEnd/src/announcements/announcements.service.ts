@@ -5,7 +5,6 @@ import { Announcement } from 'src/schemas/announcement.schema';
 import { CreateAnnouncementDto } from 'src/dto/createAnnouncement.dto';
 import { UsersService } from 'src/users/user.service';
 import { AnnouncementsResponseDto } from 'src/dto/announcementsResponse.dto';
-import { plainToInstance } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable } from 'rxjs';
 import { UpdateAnnouncementDto } from 'src/dto/updateAnnouncement.dto';
@@ -20,41 +19,10 @@ export class AnnouncementsService {
     private readonly _usersService: UsersService,
   ) {}
 
-  async findAllPerPage(
-    page: number = 1,
-  ): Promise<{ announcementDtos: AnnouncementsResponseDto[]; total: number }> {
-    const limit = 10;
-    const skip = (page - 1) * limit;
-    const announcements = await this.announcementModel
-      .find()
-      .select('userId title description createdAt announcementId')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-    const userIds = [...new Set(announcements.map((a) => a.userId))];
-    const users = await this._usersService.getUsersbyIds(userIds);
-    const userMap: Map<string, string> = new Map(
-      users.map((u) => [u.userId, u.name]),
-    );
-    const total = await this.announcementModel.countDocuments().exec();
-
-    const announcementDtos: AnnouncementsResponseDto[] = announcements.map(
-      (a) => ({
-        announcementId: a.announcementId,
-        title: a.title,
-        description: a.description,
-        createdAt: a.createdAt,
-        userName: userMap.get(a.userId) || 'Unknown',
-      }),
-    );
-    return { announcementDtos, total };
-  }
-
   async GetUserAnnouncements(
     page: number,
   ): Promise<{ announcementDtos: AnnouncementsResponseDto[]; total: number }> {
-    const limit = 10;
+    const limit = 9;
     const skip = (page - 1) * limit;
     const currentUser = await this._usersService.getCurrentUser();
 
@@ -70,7 +38,7 @@ export class AnnouncementsService {
       announcementId: a.announcementId,
       title: a.title,
       description: a.description,
-      createdAt: a.createdAt,
+      createdAt: a.createdAt.toLocaleString(),
       userName: currentUser?.name,
     }));
     const total = await this.announcementModel
@@ -81,14 +49,20 @@ export class AnnouncementsService {
     return {announcementDtos, total}
   }
 
-  async findAll(): Promise<{
+  async findAll(
+    page: number,
+  ): Promise<{
     announcementDtos: AnnouncementsResponseDto[];
     total: number;
   }> {
+    const limit = 9;
+    const skip = (page - 1) * limit;
     const announcements = await this.announcementModel
       .find()
-      .select('userId title description createdAt')
+      .select('announcementId userId title description createdAt')
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .exec();
     const userIds = [...new Set(announcements.map((a) => a.userId))];
     const users = await this._usersService.getUsersbyIds(userIds);
@@ -98,13 +72,15 @@ export class AnnouncementsService {
     const total = await this.announcementModel.countDocuments().exec();
     const announcementDtos: AnnouncementsResponseDto[] = announcements.map(
       (a) => ({
+        announcementId : a.announcementId,
         title: a.title,
         description: a.description,
-        createdAt: a.createdAt,
+        createdAt: a.createdAt.toLocaleString(),
         userName: userMap.get(a.userId),
       }),
     );
     // await new Promise((resolve) => setTimeout(resolve, 5000));
+    
     return {
       announcementDtos,
       total,
@@ -126,13 +102,17 @@ export class AnnouncementsService {
     const newAnnouncement: AnnouncementsResponseDto = {
       ...createAnnouncementDto,
       announcementId: savedAnnouncement.announcementId,
-      createdAt: savedAnnouncement.createdAt,
+      createdAt: savedAnnouncement.createdAt.toLocaleString(),
       userName: currentUser?.name,
     };
+
+    console.log(" created announcement ", newAnnouncement);
     this.sseService.pushEvent({
       type: 'CREATE',
       data: newAnnouncement,
     });
+    return newAnnouncement;
+
   }
 
   async delete(announcementId: string): Promise<boolean> {
@@ -164,7 +144,7 @@ export class AnnouncementsService {
       announcementId: result.announcementId,
       title: result.title,
       description: result.description,
-      createdAt: result.createdAt,
+      createdAt: result.createdAt.toLocaleString(),
       userName: currentUser?.name,
     };
     this.sseService.pushEvent({

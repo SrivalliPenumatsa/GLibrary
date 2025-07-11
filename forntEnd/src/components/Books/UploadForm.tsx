@@ -3,10 +3,8 @@
 import { displayGenres } from "@/lib/genreMap";
 import { useRouter } from "next/navigation";
 import { useState, FormEvent, ChangeEvent } from "react";
-type Props = {
-  token?: string;
-};
-export default function UploadForm({ token }: Props) {
+
+export default function UploadForm() {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -73,9 +71,6 @@ export default function UploadForm({ token }: Props) {
         method: "POST",
         body: bookData,
         credentials: "include",
-        headers: {
-          JwtToken: `${token}`,
-        },
       });
 
       if (!response.ok) {

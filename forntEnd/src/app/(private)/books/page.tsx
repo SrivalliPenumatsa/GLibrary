@@ -6,14 +6,16 @@ export default async function BooksPage({
 }: {
   searchParams: { search?: string; genre?: string };
 }) {
+  const { search, genre } = await searchParams;
+
   return (
-    <div className="bg-[#F5F1ED] min-h-screen relative">
+    <div className="bg-[#F5F1ED] min-h-220 rounded-sm relative">
       <div className="fixed top-9 right-21 z-50">
         <BookSearch />
       </div>
 
       <div className="p-8 pt-12">
-        <BookList search={searchParams.search} genre={searchParams.genre} />
+        <BookList search={search} genre={genre} />
       </div>
     </div>
   );

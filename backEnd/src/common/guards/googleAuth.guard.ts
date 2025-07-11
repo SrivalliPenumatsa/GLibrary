@@ -2,8 +2,6 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { HttpService } from '@nestjs/axios';
 import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
-// import { JwtService } from '@nestjs/jwt';
-import * as jwt from 'jsonwebtoken';
 
 
 @Injectable()

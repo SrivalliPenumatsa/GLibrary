@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import SkeletonLoader from "../shared/SkeletonLoader";
 import { getDiscussions } from "@/services/discussions/actions";
 import { Discussion } from "@/lib/types";
-import { cookies } from "next/headers";
 
 interface DiscussionListDisplayProps {
   bookId: string;
@@ -14,10 +13,9 @@ export default async function DiscussionListDisplay({
   let discussions: Discussion[] = [];
   let error: string | null = null;
 
-  const token = (await cookies()).get("authToken")?.value;
 
   try {
-    discussions = await getDiscussions(bookId, token!);
+    discussions = await getDiscussions(bookId);
     console.log("Discussions fetched:", { count: discussions.length });
   } catch (err) {
     console.error(`Error fetching discussions for bookId=${bookId}:`, err);
@@ -26,7 +24,7 @@ export default async function DiscussionListDisplay({
 
   return (
     <Suspense fallback={<SkeletonLoader />}>
-      <div className="space-y-4 overflow-auto">
+      <div className="space-y-4 max-h-170 overflow-auto scrollbar-custom">
         {error && (
           <p className="text-[#C45E4C] p-4 bg-[#F5F1ED] rounded-lg border border-[#A38579]">
             {error}
@@ -40,9 +38,9 @@ export default async function DiscussionListDisplay({
           discussions.map((discussion) => (
             <div
               key={discussion.discussionId}
-              className="p-2 flex flex-row gap-x-2"
+              className="p-2 flex flex-row gap-x-2 border border-gray-200 rounded-l-lg bg-white shadow-sm"
             >
-              <span className="min-w-50 border border-gray-200 rounded-lg bg-white shadow-sm p-2 px-4">
+              <span className="min-w-50  p-2 px-4">
               <p className="font-semibold text-gray-800">
                 {discussion.userName}
               </p>
@@ -50,7 +48,7 @@ export default async function DiscussionListDisplay({
                 {new Date(discussion.createdAt).toLocaleString()}
               </p>
               </span>
-              <span className="border border-gray-200 rounded-lg bg-white shadow-sm p-2 ">
+              <span className=" p-2 ">
               <p className="text-gray-700 my-2">{discussion.content}</p>
               </span>
               {/* <p className="font-semibold text-gray-800">

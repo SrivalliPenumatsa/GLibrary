@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { auth } from "@/auth";
 import { endpoints } from "@/lib/endpoints";
 import { revalidateTag } from "next/cache";
 
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
 
 export async function GET(request: NextRequest) {
-  const token = request.headers.get("JwtToken");
+  const token = request.headers.get("accessToken");
 
   const { searchParams } = new URL(request.url);
   const bookId = searchParams.get("bookId") || "";
@@ -23,7 +21,7 @@ export async function GET(request: NextRequest) {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        JwtToken: `${token}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",
@@ -66,6 +64,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         JwtToken: `${token}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",

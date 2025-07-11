@@ -3,14 +3,22 @@
 import path from "path";
 import fs from "fs/promises";
 import { revalidateTag } from "next/cache";
+import { cookies } from "next/headers";
+
 
 const BASE_URL = "http://localhost:3000";
+
+async function GetTokenFromCookie()
+{
+  const token = (await cookies()).get("accessToken")?.value;
+  return token;
+
+}
 
 export async function CreateAnnouncement(
   name: string,
   description: string,
   imageFile: File,
-  token: string
 ) {
   const fileExt = imageFile.name.split(".").pop();
   const title = name.concat(`.${fileExt}`);
@@ -18,11 +26,13 @@ export async function CreateAnnouncement(
   const response = await fetch(`${BASE_URL}/api/announcements`, {
     method: "POST",
     headers: {
-      JwtToken: `${token}`,
+      accessToken : `${await GetTokenFromCookie()}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ title, description }),
   });
+  console.log(" response in action ",response);
+  
 
   if (!response.ok) {
     throw new Error("Failed to create announcement");
@@ -45,7 +55,6 @@ export async function CreateAnnouncement(
 
 export async function submitUpdatedAnnouncement(
   formData: FormData,
-  token: string
 ) {
   const file2 = formData.get("imageFile") as File;
   if (file2.size > 0) {
@@ -75,7 +84,7 @@ export async function submitUpdatedAnnouncement(
     {
       method: "PATCH",
       headers: {
-        JwtToken: `${token}`,
+        accessToken: `${await GetTokenFromCookie()}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -93,14 +102,13 @@ export async function submitUpdatedAnnouncement(
 
 export async function deleteAnnouncement(
   announcementId: string,
-  token: string
 ) {
   const response = await fetch(
     `${BASE_URL}/api/announcements/${announcementId}`,
     {
       method: "DELETE",
       headers: {
-        JwtToken: `${token}`,
+        accessToken: `${await GetTokenFromCookie()}`,
       },
     }
   );
@@ -110,38 +118,17 @@ export async function deleteAnnouncement(
   }
 }
 
-export async function getAllAnnouncements(
-  page: number = 1,
-  token: string
-): Promise<any> {
-  const response = await fetch(`${BASE_URL}/api/announcements?page=${page}&type=all`, {
-    headers: {
-      JwtToken: `${token}`,
-    },
-    next: { tags: ["announcements"] },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch announcements");
-  }
-  const data = await response.json();
-
-  console.log("response in action ...................................... ",data);
-  return data;
-}
 
 export async function getUserAnnouncements(
   page: number = 1,
-  token: string
 ): Promise<any> {
   const response = await fetch(`${BASE_URL}/api/announcements?page=${page}&type=user`, {
     method: "GET",
     next: { tags: ["userAnnouncements"] },
     headers: {
-      JwtToken: `${token}`,
+      accessToken : `${await GetTokenFromCookie()}`,
     },
   });
-  // console.log("response from backend ",response.body);
   
   if (!response.ok) {
     throw new Error("Failed to fetch user announcements");

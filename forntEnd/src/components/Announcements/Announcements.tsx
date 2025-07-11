@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllAnnouncements } from "@/services/announcements/actions";
+// import { getAllAnnouncements } from "@/services/announcements/actions";
 import { Announcement } from "@/lib/types";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { useSession } from "next-auth/react";
 import SkeletonLoader from "@/components/shared/SkeletonLoader";
+import { useUser } from "@/services/contexts/UserContext";
 
 type Props = {
   token?: string;
@@ -17,17 +18,24 @@ export default function Announcements({ token }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useUser()
   const session = useSession();
+  
 
   const fetchAnnouncements = async (page: number) => {
     setLoading(true); 
     try {
-      const { announcementDtos, total } =
-        await getAllAnnouncements(page, token!);
+      const BASE_URL = "http://localhost:3000";
 
-      setAnnouncements(announcementDtos);
-      setTotal(total);
+      const response = await fetch(`${BASE_URL}/api/announcements?page=${page}&type=all`, {
+         credentials: "include" ,
+        next: { tags: ["announcements"] },
+      });
+      const data = await response.json();
+
+      setAnnouncements(data.announcementDtos);
+      
+      setTotal(data.total);
     } catch (err) {
       console.error("Announcements component error:", err);
       setError("Failed to load announcements. Please try again later.");
@@ -46,8 +54,7 @@ export default function Announcements({ token }: Props) {
       "http://localhost:3001/announcements/stream",
       {
         headers: {
-          Authorization: `Bearer ${session.data?.accessToken}`,
-          JwtToken: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
         heartbeatTimeout: 95000,
         withCredentials: true,
@@ -101,7 +108,7 @@ export default function Announcements({ token }: Props) {
   // }, [total]);
 
   return (
-    <div className="min-h-screen bg-[#A38579] p-6">
+    <div className="max-h-220 bg-[#A38579] p-6 overflow-auto">
       <div className="max-w-7xl mx-auto">
         {error && (
           <div className="p-4 mb-6 bg-[#C45E4C] text-white rounded-lg font-medium">
@@ -119,6 +126,7 @@ export default function Announcements({ token }: Props) {
           <>
             {/* announcements */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div> {user?.name}</div>
               {announcements.map((announcement) => (
                 <div
                   key={announcement.announcementId}
@@ -146,7 +154,7 @@ export default function Announcements({ token }: Props) {
                       {announcement.description}
                     </p>
                     <p className="text-sm text-[#81322A] font-medium">
-                      {new Date(announcement.createdAt).toLocaleString()}
+                      {announcement.createdAt}
                     </p>
                     <p className="text-sm text-[#81322A] font-medium">
                       {announcement.userName}

@@ -6,16 +6,17 @@ import { Book } from "@/lib/types";
 import { cookies } from "next/headers";
 
 export default async function BookPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
   let book: Book | null = null;
   let error: string | null = null;
   let path;
-  const token = (await cookies()).get("authToken")?.value;
+  const token = (await cookies()).get("accessToken")?.value;
   try {
-    const response = await fetch(`http://localhost:3000/api/books/${id}`, {
+    const response = await fetch(`http://localhost:3000
+/api/books/${id}`, {
       method: "GET",
       headers: {
-        JwtToken: `${token}`,
+        accessToken: `${token}`,
         "Content-Type": "application/json",
       },
       next: { tags: ["book"] },
@@ -27,7 +28,7 @@ export default async function BookPage({ params }: { params: { id: string } }) {
 
     const data = await response.json();
     book = data;
-    console.log("Book fetched:");
+    console.log("Book fetched:.....1");
 
     if (!book) throw new Error("Book not found");
     path = `/CoverPages/${book.title}_${book.author}`;
@@ -60,7 +61,7 @@ export default async function BookPage({ params }: { params: { id: string } }) {
 
   return (
     <Suspense fallback={<SkeletonLoader />}>
-      <div className="flex flex-col lg:flex-row gap-8 p-6 bg-[#DAD7CE] min-h-screen">
+      <div className="flex flex-col lg:flex-row gap-8 p-6 bg-[#DAD7CE] min-h-180 max-h-220 overflow-auto">
         <div className="w-full lg:w-1/2 bg-[#F5F1ED] p-6 rounded-lg shadow-sm border border-[#A38579]">
           <h1 className="text-2xl font-bold text-[#29221F] mb-4">
             {book.title}
@@ -80,7 +81,7 @@ export default async function BookPage({ params }: { params: { id: string } }) {
           <img
             src={`${path}.jpg`}
             alt={book.title}
-            className="w-80 h-120 object-cover rounded-lg my-4 border border-[#A38579]"
+            className="w-70 h-100 object-cover rounded-lg my-4 border border-[#A38579]"
           />
           <Link
             href={`/book/${book.bookId}/content?file=${book.title}_${book.author}`}
@@ -89,7 +90,7 @@ export default async function BookPage({ params }: { params: { id: string } }) {
             Read Book
           </Link>
         </div>
-        <div className="w-full lg:w-1/2">
+        <div className="w-190 lg:w-1/2">
           <DiscussionList bookId={book.bookId} />
         </div>
       </div>

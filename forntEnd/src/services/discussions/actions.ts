@@ -1,11 +1,20 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-export async function submitDiscussion(bookId: string, content: string, token:string): Promise<void> {
-  console.log('Server Action | Submitting discussion:', { bookId, content });
+async function GetTokenFromCookie()
+{
+  const token = (await cookies()).get("accessToken")?.value;
+  return token;
+
+}
+
+
+export async function submitDiscussion(bookId: string, content: string): Promise<void> {
+  console.log('Server Action | Submitting discussion:', { bookId, content }, await GetTokenFromCookie());
 
   try {
 
@@ -13,7 +22,8 @@ export async function submitDiscussion(bookId: string, content: string, token:st
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'JwtToken': `${token}`,
+        Authorization: `Bearer ${await GetTokenFromCookie()}`,
+        'JwtToken': `${await GetTokenFromCookie()}`,
       },
       body: JSON.stringify({ bookId, content }),
     });
@@ -31,16 +41,14 @@ export async function submitDiscussion(bookId: string, content: string, token:st
   }
 }
 
-export async function getDiscussions(bookId: string, token : string): Promise<any> {
-  console.log('Server Action | Fetching discussions for bookId:', bookId);
-
+export async function getDiscussions(bookId: string): Promise<any> {
   try {
 
     const response = await fetch(`${BASE_URL}/api/discussions?bookId=${bookId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'JwtToken': `${token}`,
+        'accessToken': `${await GetTokenFromCookie()}`,
       },
       next: { tags: ['discussions'] },
     });

@@ -20,6 +20,7 @@ export const MailSignInModal: React.FC<MailSignInModalProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
+
   const validatePasswordMatch = (password: string, confirmPassword: string) => {
     if (password !== confirmPassword) return "Passwords do not match.";
     if (!/[A-Z]/.test(password))
@@ -63,6 +64,7 @@ export const MailSignInModal: React.FC<MailSignInModalProps> = ({
       }
 
       const data = await response.json();
+
       onClose();
       router.push("/");
     } catch (err) {

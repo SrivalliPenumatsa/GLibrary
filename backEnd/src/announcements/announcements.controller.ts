@@ -24,22 +24,20 @@ export class AnnouncementsController {
     private readonly sseService: SseService,
   ) {}
 
-  @Get()
-  async findAllPerPage (
-    @Query('page') page: number = 1,
-  ):Promise<{ announcementDtos: AnnouncementsResponseDto[], total: number }>  {
-    return await this.announcementsService.findAllPerPage(page);
-  }
-
   @Post()
   async create(@Body() createAnnouncementDto: CreateAnnouncementDto) {
- await this.announcementsService.create(createAnnouncementDto);
+    const data = await this.announcementsService.create(createAnnouncementDto);
+    console.log("data", data);
+    
+  return data;
   }
 
   @Get('all')
-  async findAll(): Promise<{ announcementDtos: AnnouncementsResponseDto[], total: number }>
+  async findAll(
+    @Query('page') page: number = 1,
+  ): Promise<{ announcementDtos: AnnouncementsResponseDto[], total: number }>
   {
-    return this.announcementsService.findAll();
+    return this.announcementsService.findAll(page);
   }
 
   @Get('user')

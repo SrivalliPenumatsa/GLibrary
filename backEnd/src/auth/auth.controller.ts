@@ -5,6 +5,7 @@ import { RegisterDto } from 'src/dto/register.dto';
 import { LoginDto } from 'src/dto/login.dto';
 import { GoogleLoginDto } from 'src/dto/googleLogin.dto';
 import { GoogleAuthGuard } from 'src/common/guards/googleAuth.guard';
+import { LoginResponseDto } from 'src/dto/loginResponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +13,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async LogIn(@Body() loginDto: LoginDto) {
+  async LogIn(@Body() loginDto: LoginDto) : Promise<LoginResponseDto> {
     return await this.authService.LogIn(loginDto);
   }
 
@@ -25,7 +26,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(GoogleAuthGuard)
   @Post('googleLogin')
-  async GoogleLogin(@Body() dto : GoogleLoginDto ) {
+  async GoogleLogin(@Body() dto : GoogleLoginDto ) : Promise<LoginResponseDto> {
     return await this.authService.GoogleLogin(dto);
   }
 

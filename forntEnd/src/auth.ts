@@ -1,3 +1,4 @@
+
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
@@ -16,41 +17,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         console.error("No account data available");
         return true; 
       }
-      console.log("access token in sighIn ", account.access_token);
       try {
-        const response = await fetch(`http://localhost:3001/auth/googleLogin`, {
-          method: 'POST',
+        const response = await fetch("http://localhost:3000/api/auth/googleLogin", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${account.access_token}`
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${account.access_token}`,
           },
           body: JSON.stringify({
             googleId: account.providerAccountId,
             email: user.email,
             name: user.name,
-          })
+          }),
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to authenticate with backend');
-        }
-
-        const data = await response.json();
-        
-        if (data?.jwtToken) {
-          (await cookies()).set('authToken', data.jwtToken, {
+        const data = await response.json(); 
+        if (data?.token) {
+          (await cookies()).set('accessToken', data.token, {
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60 * 60 
           });
+
           return true;
+          
         }
+        
         return false;
       } catch (error) {
         console.error("Error adding user to backend:", error);
         return false; 
       }
     },
-    async jwt({ token, account, user }) {
+    async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
         token.id = account.providerAccountId; 

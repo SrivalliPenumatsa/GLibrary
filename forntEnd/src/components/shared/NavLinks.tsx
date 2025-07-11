@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 type Props = {
   token?: string;
 };
-export default function NavLinks( { token }: Props) {
+export default function NavLinks() {
   const pathname = usePathname();
 return (
 <nav className="space-y-2">

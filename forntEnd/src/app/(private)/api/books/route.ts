@@ -3,19 +3,20 @@ import { endpoints } from "@/lib/endpoints";
 import { writeFile } from "fs/promises";
 import path from "path";
 import { CreateBook } from "@/lib/types";
+import { cookies } from "next/headers";
 
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
 
 export async function GET(request: NextRequest) {
-  console.log("GET in books route.ts...");
+  const cookieAuthToken = (await cookies()).get("accessToken")?.value;
+const headerAuthToken = await request.headers.get('accessToken');
+
+const tokenToUse = cookieAuthToken ?? headerAuthToken; 
 
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") || "";
   const genre = searchParams.get("genre") || "";
-
   try {
-    const token = request.headers.get("JwtToken");
-
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (genre) params.set("genre", genre);
@@ -23,12 +24,11 @@ export async function GET(request: NextRequest) {
     const url = queryString
       ? `${BACKEND_BASE_URL}${endpoints.books}?${queryString}`
       : `${BACKEND_BASE_URL}${endpoints.books}`;
-    console.log("Fetching books from backend:", url);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        JwtToken: `${token}`,
+        'Authorization': `Bearer ${tokenToUse}`,
         "Content-Type": "application/json",
       },
       credentials: "include",
@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         JwtToken: `${token}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",

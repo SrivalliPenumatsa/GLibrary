@@ -1,25 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { endpoints } from "@/lib/endpoints";
 
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { bookId: string } }
 ) {
-  console.log("GET in books/[bookId] route.ts...");
-  console.log("Cookie header:", request.headers.get("cookie"));
-  const token = request.headers.get("JwtToken");
+  const token = request.headers.get("accessToken");
+  const {bookId} = params;
   try {
-    console.log("Token:", token);
-
-    const url = `${BACKEND_BASE_URL}${endpoints.books}/${params.bookId}`;
+    const url = `${BACKEND_BASE_URL}${endpoints.books}/${bookId}`;
     console.log("Fetching book from backend:", url);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        JwtToken: `${token}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",

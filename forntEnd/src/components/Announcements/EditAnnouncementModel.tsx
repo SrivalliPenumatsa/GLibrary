@@ -14,7 +14,6 @@ interface EditAnnouncementModalProps {
   announcement: Announcement | null;
   setError: (error: string | null) => void;
   onSuccess: () => void;
-  token: string;
 }
 
 export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
@@ -23,11 +22,10 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   announcement,
   setError,
   onSuccess,
-  token,
 }) => {
   if (!announcement) return null;
   const handleDelete = async () => {
-    await deleteAnnouncement(announcement.announcementId, token!);
+    await deleteAnnouncement(announcement.announcementId);
     onSuccess();
     onClose();
     setError(null);
@@ -51,7 +49,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
           announcement.title.lastIndexOf(".")
         )}`
       );
-      await submitUpdatedAnnouncement(formData, token!);
+      await submitUpdatedAnnouncement(formData);
       onSuccess();
       onClose();
       setError(null);}

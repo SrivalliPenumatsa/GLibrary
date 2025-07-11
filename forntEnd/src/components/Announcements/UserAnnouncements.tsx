@@ -93,7 +93,7 @@ export default function AnnouncementsList({
                     {announcement.description}
                   </p>
                   <p className="text-xs text-[#81322A]">
-                    {new Date(announcement.createdAt).toLocaleString()}
+                    {announcement.createdAt}
                   </p>
                 </div>
               </div>
@@ -131,7 +131,6 @@ export default function AnnouncementsList({
         announcement={selectedAnnouncement}
         setError={setError}
         onSuccess={handleEditSuccess}
-        token={token!}
       />
     </div>
   );

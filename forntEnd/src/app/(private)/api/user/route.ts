@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { endpoints } from "@/lib/endpoints";
 
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get("JwtToken");
-
+    const token = request.headers.get("accessToken");
     const url = `${BACKEND_BASE_URL}${endpoints.currentUser}`;
-    console.log("Fetching user from backend:", url);
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
         JwtToken: `${token}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",
@@ -35,10 +33,12 @@ export async function GET(request: NextRequest) {
   }
 }
 export async function POST(request: NextRequest) {
+  const token = request.headers.get("accessToken");
   try {
     const response = await fetch(`${BACKEND_BASE_URL}/users/me`, {
       method: "GET",
       headers: {
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       credentials: "include",

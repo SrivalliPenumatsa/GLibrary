@@ -1,5 +1,6 @@
 "use client";
 
+import { useUser } from "@/services/contexts/UserContext";
 import { Modal } from "../modal/Modal";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -18,6 +19,8 @@ export const MailLoginModal: React.FC<MailLoginModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { setUser } = useUser()
+
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,7 +45,11 @@ export const MailLoginModal: React.FC<MailLoginModalProps> = ({
         throw new Error(errorData.message || "Login failed");
       }
 
-      const data = await response.json();
+      const data = await response.json();      
+      setUser({
+        name: data.name,
+        email: data.email
+      })
       onClose();
       router.push("/");
     } catch (err) {

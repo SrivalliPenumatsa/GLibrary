@@ -13,7 +13,7 @@ export default async function BookList({ search, genre }: BookListProps) {
   let books: Book[] = [];
   let error: string | null = null;
 
-  const token = (await cookies()).get("authToken")?.value;
+  const token = (await cookies()).get("accessToken")?.value;
   try {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
@@ -25,9 +25,10 @@ export default async function BookList({ search, genre }: BookListProps) {
     const response = await fetch(`http://localhost:3000${url}`, {
       method: "GET",
       headers: {
-        JwtToken: `${token}`,
+        accessToken: `${token}`,
         "Content-Type": "application/json",
       },
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -44,7 +45,7 @@ export default async function BookList({ search, genre }: BookListProps) {
 
   return (
     <Suspense fallback={<SkeletonLoader />}>
-      <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+      <div className="space-y-4 max-h-[80vh] overflow-auto pr-2">
         {error && (
           <div className="p-3 bg-[#F5F1ED] text-[#C45E4C] rounded-lg border border-[#A38579]">
             {error}

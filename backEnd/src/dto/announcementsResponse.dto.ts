@@ -10,7 +10,7 @@ announcementId?: string
 
   @Expose()
   @Transform(({ value }) => value.toISOString(), { toPlainOnly: true })
-  createdAt: Date;
+  createdAt: string;
 
   @Expose()
   userName?: string;

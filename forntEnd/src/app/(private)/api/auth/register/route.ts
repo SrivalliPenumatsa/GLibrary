@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { endpoints } from "@/lib/endpoints";
-const BACKEND_BASE_URL = "http://localhost:3001";
+const BACKEND_BASE_URL = process.env.NEST_API_BASE_URL;
 
 export async function POST(request: Request) {
   try {

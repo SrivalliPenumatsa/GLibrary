@@ -1,6 +1,5 @@
 "use client";
-
-import { Model } from "@/components/ui/model/Model";
+import { Modal } from "../modal/Modal";
 import { useParams } from "next/navigation";
 
 interface BookShelfModalProps {
@@ -82,7 +81,7 @@ export default function BookShelfModel(props: BookShelfModalProps) {
       </div>
       </Model> */}
 
-<Model
+<Modal
   isOpen={props.isOpen}
   onClose={props.onClose}
 >
@@ -136,7 +135,7 @@ export default function BookShelfModel(props: BookShelfModalProps) {
       </form>
     </div>
   </div>
-</Model>
+</Modal>
     </div>
   );
 }

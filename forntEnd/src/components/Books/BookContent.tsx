@@ -8,7 +8,7 @@ export default function BookContent({ bookName }: BookContentProps) {
   const pdfUrl = `/uploads/${bookName}.pdf`;
 
   const sendAliveRequest = async () => {
-    // await apiRequest()
+    // await apiRequest();
   }
 
   return (

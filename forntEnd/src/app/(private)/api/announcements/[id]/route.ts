@@ -1,22 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { revalidateTag } from "next/cache";
 
-const API_BASE_URL =
-  typeof window === "undefined"
-    ? process.env.NEST_API_BASE_URL
-    : process.env.NEXT_PUBLIC_NEST_API_BASE_URL;
+const API_BASE_URL = process.env.NEST_API_BASE_URL
 
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const jwtTokenHeader = request.headers.get("JwtToken");
+  const token = request.headers.get("accessToken");
   try {
     const body = await request.json();
     const response = await fetch(`${API_BASE_URL}/announcements/update`, {
       method: "PATCH",
       headers: {
-        JwtToken: `${jwtTokenHeader}`,
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
@@ -37,16 +34,16 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const jwtTokenHeader = request.headers.get("JwtToken");
+  const token = request.headers.get("accessToken");
 
   try {
     const response = await fetch(`${API_BASE_URL}/announcements/${params.id}`, {
       method: "DELETE",
       headers: {
-        JwtToken: `${jwtTokenHeader}`,
+        'Authorization': `Bearer ${token}`,
       },
     });
 
